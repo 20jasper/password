@@ -110,7 +110,7 @@ pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> 
 }
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
-    let layout = Layout::horizontal([Constraint::Min(20), Constraint::Length(40)]);
+    let layout = Layout::horizontal([Constraint::Min(22), Constraint::Length(40)]);
     let [password_area, tabs_area] = layout.areas(frame.size());
 
     password::render(frame, password_area, app);

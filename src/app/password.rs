@@ -7,7 +7,7 @@ use core::{fmt::Display, ops::RangeInclusive};
 use rand::Rng;
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Paragraph},
+    widgets::{block::Title, Paragraph, Wrap},
 };
 
 use super::{list::Items, styled_block, App};
@@ -80,6 +80,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
         Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
         Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
     ])
+    .wrap(Wrap { trim: true })
     .block(block);
 
     frame.render_widget(password_text, area);
