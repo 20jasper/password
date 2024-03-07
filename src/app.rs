@@ -55,7 +55,7 @@ impl App {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left | KeyCode::Char('h') => {
-                self.length = self.length.saturating_sub(1).max(6);
+                self.length = self.length.saturating_sub(1).max(3);
                 self.update_password();
             }
             KeyCode::Right | KeyCode::Char('l') => {
@@ -157,7 +157,7 @@ mod tests {
             app.handle_key_event(KeyCode::Left.into());
         }
 
-        assert_eq!(app.length, 6);
+        assert_eq!(app.length, 3);
     }
 
     #[test]
