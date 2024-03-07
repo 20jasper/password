@@ -13,11 +13,24 @@ use ratatui::{
     widgets::{block::Position, Borders, Paragraph},
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
     length: usize,
     password: String,
     exit: bool,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        let length = 8;
+        let password = password::pin(length);
+
+        Self {
+            length,
+            password,
+            exit: false,
+        }
+    }
 }
 
 impl App {
