@@ -2,7 +2,7 @@ use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block, Tabs},
+    widgets::{block::Title, Block, Padding, Tabs},
 };
 
 use crate::{password, tui};
@@ -102,7 +102,8 @@ impl Widget for &App {
                     .position(Position::Bottom),
             )
             .borders(Borders::ALL)
-            .border_set(border::THICK);
+            .border_set(border::THICK)
+            .padding(Padding::horizontal(1));
 
         let counter_text = Text::from(vec![
             Line::from(vec!["Length: ".into(), self.length.to_string().yellow()]),
