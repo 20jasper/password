@@ -2,7 +2,7 @@ use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block, Padding, Tabs},
+    widgets::{block::Title, Block, List, ListDirection, Padding},
 };
 
 use crate::{password, tui};
@@ -89,16 +89,7 @@ fn render_password_ui(frame: &mut Frame<'_>, area: Rect, app: &App) {
         " Quit ".into(),
         "<Q> ".blue().bold(),
     ]));
-    let block = Block::default()
-        .title(title.alignment(Alignment::Center))
-        .title(
-            instructions
-                .alignment(Alignment::Center)
-                .position(Position::Bottom),
-        )
-        .borders(Borders::ALL)
-        .border_set(border::THICK)
-        .padding(Padding::horizontal(1));
+    let block = styled_block(title, instructions);
 
     let password_text = Paragraph::new(vec![
         Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
@@ -117,6 +108,21 @@ fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         " Last ".into(),
         "<Up>/<K>".blue().bold(),
     ]));
+    let block = styled_block(title, instructions);
+
+    let items = ["Item 1", "Item 2", "Item 3"];
+    let list = List::new(items)
+        .block(block)
+        .style(Style::default().fg(Color::White))
+        .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
+        .highlight_symbol(">>")
+        .repeat_highlight_symbol(true)
+        .direction(ListDirection::BottomToTop);
+
+    frame.render_widget(list, area);
+}
+
+fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> {
     let block = Block::default()
         .title(title.alignment(Alignment::Center))
         .title(
@@ -127,14 +133,7 @@ fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         .borders(Borders::ALL)
         .border_set(border::THICK)
         .padding(Padding::horizontal(1));
-
-    let password_text = Paragraph::new(vec![
-        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
-        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
-    ])
-    .block(block);
-
-    frame.render_widget(password_text, area);
+    block
 }
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
