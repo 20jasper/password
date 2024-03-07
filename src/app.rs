@@ -1,10 +1,11 @@
-mod password;
+pub mod list;
+pub mod password;
 
 use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block, List, ListState, Padding},
+    widgets::{block::Title, Block, ListState, Padding},
 };
 
 use crate::tui;
@@ -84,27 +85,6 @@ impl App {
     }
 }
 
-fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, state: &mut ListState) {
-    let title = Title::from(" Password Types ".bold());
-    let instructions = Title::from(Line::from(vec![
-        " Next ".into(),
-        "<Down>/<J>".blue().bold(),
-        " Last ".into(),
-        "<Up>/<K>".blue().bold(),
-    ]));
-    let block = styled_block(title, instructions);
-
-    let items = ["Item 1", "Item 2", "Item 3"];
-    let list = List::new(items)
-        .block(block)
-        .style(Style::default().fg(Color::White))
-        .highlight_style(Style::default().fg(Color::Yellow))
-        .highlight_symbol(">> ")
-        .repeat_highlight_symbol(true);
-
-    frame.render_stateful_widget(list, area, state);
-}
-
 pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> {
     let block = Block::default()
         .title(title.alignment(Alignment::Center))
@@ -124,7 +104,7 @@ fn ui(frame: &mut Frame<'_>, app: &mut App) {
     let [password_area, tabs_area] = layout.areas(frame.size());
 
     password::render(frame, password_area, app);
-    render_tabs_ui(frame, tabs_area, &mut app.list_state);
+    list::render(frame, tabs_area, &mut app.list_state);
 }
 
 #[cfg(test)]
