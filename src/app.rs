@@ -2,7 +2,7 @@ use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block, List, ListDirection, Padding},
+    widgets::{block::Title, Block, List, ListState, Padding},
 };
 
 use crate::{password, tui};
@@ -17,6 +17,7 @@ use ratatui::{
 pub struct App {
     length: usize,
     password: String,
+    list_state: ListState,
     exit: bool,
 }
 
@@ -24,10 +25,10 @@ impl Default for App {
     fn default() -> Self {
         let length = 8;
         let password = password::pin(length);
-
         Self {
             length,
             password,
+            list_state: ListState::default().with_selected(Some(0)),
             exit: false,
         }
     }
@@ -57,6 +58,8 @@ impl App {
                 self.length = self.length.saturating_add(1).min(40);
                 self.update_password();
             }
+            KeyCode::Down | KeyCode::Char('j') => {}
+            KeyCode::Up | KeyCode::Char('k') => {}
             _ => {}
         }
     }
@@ -100,7 +103,7 @@ fn render_password_ui(frame: &mut Frame<'_>, area: Rect, app: &App) {
     frame.render_widget(password_text, area);
 }
 
-fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
+fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, state: &mut ListState) {
     let title = Title::from(" Password Types ".bold());
     let instructions = Title::from(Line::from(vec![
         " Next ".into(),
@@ -114,12 +117,11 @@ fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
     let list = List::new(items)
         .block(block)
         .style(Style::default().fg(Color::White))
-        .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
-        .highlight_symbol(">>")
-        .repeat_highlight_symbol(true)
-        .direction(ListDirection::BottomToTop);
+        .highlight_style(Style::default().fg(Color::Yellow))
+        .highlight_symbol(">> ")
+        .repeat_highlight_symbol(true);
 
-    frame.render_widget(list, area);
+    frame.render_stateful_widget(list, area, state);
 }
 
 fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> {
@@ -141,7 +143,7 @@ fn ui(frame: &mut Frame<'_>, app: &mut App) {
     let [password_area, tabs_area] = layout.areas(frame.size());
 
     render_password_ui(frame, password_area, app);
-    render_tabs_ui(frame, tabs_area, app);
+    render_tabs_ui(frame, tabs_area, &mut app.list_state);
 }
 
 #[cfg(test)]
