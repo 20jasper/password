@@ -53,11 +53,11 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => {
+            KeyCode::Left | KeyCode::Char('h') => {
                 self.length = self.length.saturating_sub(1);
                 self.update_password();
             }
-            KeyCode::Right => {
+            KeyCode::Right | KeyCode::Char('l') => {
                 self.length = self.length.saturating_add(1).min(40);
                 self.update_password();
             }
@@ -88,9 +88,9 @@ impl Widget for &App {
         let title = Title::from(" Password Generator ".bold());
         let instructions = Title::from(Line::from(vec![
             " Decrease Length ".into(),
-            "<Left>".blue().bold(),
+            "<Left>/<H>".blue().bold(),
             " Increase Length ".into(),
-            "<Right>".blue().bold(),
+            "<Right>/<L>".blue().bold(),
             " Quit ".into(),
             "<Q> ".blue().bold(),
         ]));
