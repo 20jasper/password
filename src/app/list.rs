@@ -1,4 +1,4 @@
-use core::fmt;
+use core::fmt::Display;
 
 use ratatui::{
     prelude::*,
@@ -7,46 +7,22 @@ use ratatui::{
 
 use super::styled_block;
 
-#[derive(Default, Debug, Clone, PartialEq, Eq)]
-pub enum Item {
-    #[default]
-    Pin,
-    Item2,
-    Item3,
-}
-
-impl fmt::Display for Item {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Item::Pin => write!(f, "Pin"),
-            Item::Item2 => write!(f, "Item 2"),
-            Item::Item3 => write!(f, "Item 3"),
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Items {
-    items: Vec<Item>,
+pub struct Items<T> {
+    items: Vec<T>,
     state: ListState,
     selected: Option<usize>,
 }
 
-impl Default for Items {
-    fn default() -> Self {
-        let items = vec![Item::Pin, Item::Item2, Item::Item3];
-        let mut state = ListState::default();
-        state.select(Some(0));
-
+impl<T> Items<T> {
+    pub fn new(items: Vec<T>) -> Self {
         Self {
             items,
-            state,
+            state: ListState::default().with_selected(Some(0)),
             selected: Some(0),
         }
     }
-}
 
-impl Items {
     pub fn select(&mut self, index: usize) {
         self.selected = Some(index);
         self.state.select(Some(index));
@@ -72,7 +48,7 @@ impl Items {
     }
 }
 
-pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items) {
+pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>) {
     let title = Title::from(" Password Types ".bold());
     let instructions = Title::from(Line::from(vec![
         " Next ".into(),
@@ -82,16 +58,12 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items) {
     ]));
     let block = styled_block(title, instructions);
 
-    let list = List::new(
-        [Item::Pin, Item::Item2, Item::Item3]
-            .into_iter()
-            .map(|x| x.to_string()),
-    )
-    .block(block)
-    .style(Style::default().fg(Color::White))
-    .highlight_style(Style::default().fg(Color::Yellow))
-    .highlight_symbol(">> ")
-    .repeat_highlight_symbol(true);
+    let list = List::new(items.items.iter().map(std::string::ToString::to_string))
+        .block(block)
+        .style(Style::default().fg(Color::White))
+        .highlight_style(Style::default().fg(Color::Yellow))
+        .highlight_symbol(">> ")
+        .repeat_highlight_symbol(true);
 
     frame.render_stateful_widget(list, area, &mut items.state);
 }

@@ -5,7 +5,7 @@ use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block, ListState, Padding},
+    widgets::{block::Title, Block, Padding},
 };
 
 use crate::tui;
@@ -13,14 +13,16 @@ use color_eyre::eyre::WrapErr;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     symbols::border,
-    widgets::{block::Position, Borders, Paragraph},
+    widgets::{block::Position, Borders},
 };
+
+use self::password::PasswordType;
 
 #[derive(Debug)]
 pub struct App {
     length: usize,
     password: String,
-    list_state: list::Items,
+    list_state: list::Items<PasswordType>,
     exit: bool,
 }
 
