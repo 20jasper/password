@@ -20,7 +20,7 @@ use ratatui::{
 pub struct App {
     length: usize,
     password: String,
-    list_state: ListState,
+    list_state: list::Items,
     exit: bool,
 }
 
@@ -28,10 +28,11 @@ impl Default for App {
     fn default() -> Self {
         let length = 8;
         let password = password::pin(length);
+
         Self {
             length,
             password,
-            list_state: ListState::default().with_selected(Some(0)),
+            list_state: list::Items::default(),
             exit: false,
         }
     }
@@ -61,8 +62,12 @@ impl App {
                 self.length = self.length.saturating_add(1).min(40);
                 self.update_password();
             }
-            KeyCode::Down | KeyCode::Char('j') => {}
-            KeyCode::Up | KeyCode::Char('k') => {}
+            KeyCode::Down | KeyCode::Char('j') => {
+                self.list_state.next();
+            }
+            KeyCode::Up | KeyCode::Char('k') => {
+                self.list_state.previous();
+            }
             _ => {}
         }
     }
@@ -112,17 +117,51 @@ mod tests {
     use super::*;
 
     #[test]
-    fn handle_key_event() {
+    fn should_increase_on_right_press() {
         let mut app = App::default();
+
         app.handle_key_event(KeyCode::Right.into());
-        assert_eq!(app.length, 1);
+        assert_eq!(app.length, 9);
+
+        app.handle_key_event(KeyCode::Char('l').into());
+        assert_eq!(app.length, 10);
+    }
+
+    #[test]
+    fn should_decrease_on_left_press() {
+        let mut app = App::default();
 
         app.handle_key_event(KeyCode::Left.into());
-        assert_eq!(app.length, 0);
+        assert_eq!(app.length, 7);
 
-        app.handle_key_event(KeyCode::Left.into());
-        assert_eq!(app.length, 0);
+        app.handle_key_event(KeyCode::Char('h').into());
+        assert_eq!(app.length, 6);
+    }
 
+    #[test]
+    fn should_stop_at_max() {
+        let mut app = App::default();
+
+        for _ in 0..100 {
+            app.handle_key_event(KeyCode::Right.into());
+        }
+
+        assert_eq!(app.length, 40);
+    }
+
+    #[test]
+    fn should_stop_at_min() {
+        let mut app = App::default();
+
+        for _ in 0..100 {
+            app.handle_key_event(KeyCode::Left.into());
+        }
+
+        assert_eq!(app.length, 6);
+    }
+
+    #[test]
+    fn should_exit_on_q_press() {
         let mut app = App::default();
         app.handle_key_event(KeyCode::Char('q').into());
         assert!(app.exit);
