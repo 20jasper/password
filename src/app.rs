@@ -2,7 +2,7 @@ use std::io;
 
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, Block},
+    widgets::{block::Title, Block, Tabs},
 };
 
 use crate::tui;
@@ -15,7 +15,8 @@ use ratatui::{
 
 #[derive(Debug, Default)]
 pub struct App {
-    counter: u8,
+    length: usize,
+    password: String,
     exit: bool,
 }
 
@@ -40,13 +41,19 @@ impl App {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left => {
-                self.counter = self.counter.saturating_sub(1);
+                self.length = self.length.saturating_sub(1);
+                self.update_password();
             }
             KeyCode::Right => {
-                self.counter = self.counter.saturating_add(1);
+                self.length = self.length.saturating_add(1).min(40);
+                self.update_password();
             }
             _ => {}
         }
+    }
+
+    fn update_password(&mut self) {
+        self.password = "*".repeat(self.length);
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -84,15 +91,12 @@ impl Widget for &App {
             .borders(Borders::ALL)
             .border_set(border::THICK);
 
-        let counter_text = Text::from(vec![Line::from(vec![
-            "Value: ".into(),
-            self.counter.to_string().yellow(),
-        ])]);
+        let counter_text = Text::from(vec![
+            Line::from(vec!["Length: ".into(), self.length.to_string().yellow()]),
+            Line::from(vec!["Password: ".into(), self.password.clone().yellow()]),
+        ]);
 
-        Paragraph::new(counter_text)
-            .centered()
-            .block(block)
-            .render(area, buf);
+        Paragraph::new(counter_text).block(block).render(area, buf);
     }
 }
 
@@ -104,13 +108,13 @@ mod tests {
     fn handle_key_event() {
         let mut app = App::default();
         app.handle_key_event(KeyCode::Right.into());
-        assert_eq!(app.counter, 1);
+        assert_eq!(app.length, 1);
 
         app.handle_key_event(KeyCode::Left.into());
-        assert_eq!(app.counter, 0);
+        assert_eq!(app.length, 0);
 
         app.handle_key_event(KeyCode::Left.into());
-        assert_eq!(app.counter, 0);
+        assert_eq!(app.length, 0);
 
         let mut app = App::default();
         app.handle_key_event(KeyCode::Char('q').into());
