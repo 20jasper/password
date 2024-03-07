@@ -1,3 +1,5 @@
+mod password;
+
 use std::io;
 
 use ratatui::{
@@ -5,7 +7,7 @@ use ratatui::{
     widgets::{block::Title, Block, List, ListState, Padding},
 };
 
-use crate::{password, tui};
+use crate::tui;
 use color_eyre::eyre::WrapErr;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
@@ -82,27 +84,6 @@ impl App {
     }
 }
 
-fn render_password_ui(frame: &mut Frame<'_>, area: Rect, app: &App) {
-    let title = Title::from(" Password Generator ".bold());
-    let instructions = Title::from(Line::from(vec![
-        " Decrease Length ".into(),
-        "<Left>/<H>".blue().bold(),
-        " Increase Length ".into(),
-        "<Right>/<L>".blue().bold(),
-        " Quit ".into(),
-        "<Q> ".blue().bold(),
-    ]));
-    let block = styled_block(title, instructions);
-
-    let password_text = Paragraph::new(vec![
-        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
-        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
-    ])
-    .block(block);
-
-    frame.render_widget(password_text, area);
-}
-
 fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, state: &mut ListState) {
     let title = Title::from(" Password Types ".bold());
     let instructions = Title::from(Line::from(vec![
@@ -124,7 +105,7 @@ fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, state: &mut ListState) {
     frame.render_stateful_widget(list, area, state);
 }
 
-fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> {
+pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> {
     let block = Block::default()
         .title(title.alignment(Alignment::Center))
         .title(
@@ -142,7 +123,7 @@ fn ui(frame: &mut Frame<'_>, app: &mut App) {
     let layout = Layout::horizontal([Constraint::Min(20), Constraint::Length(40)]);
     let [password_area, tabs_area] = layout.areas(frame.size());
 
-    render_password_ui(frame, password_area, app);
+    password::render(frame, password_area, app);
     render_tabs_ui(frame, tabs_area, &mut app.list_state);
 }
 
