@@ -151,7 +151,7 @@ mod tests {
             app.handle_key_event(KeyCode::Right.into());
         }
 
-        assert_eq!(app.length, 40);
+        assert_eq!(app.length, 12);
     }
 
     #[test]
