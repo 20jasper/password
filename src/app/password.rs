@@ -1,7 +1,8 @@
-use core::{
-    fmt::{write, Display},
-    ops::RangeInclusive,
-};
+const PIN_RANGE: RangeInclusive<usize> = 3..=12;
+const RANDOM_RANGE: RangeInclusive<usize> = 8..=100;
+const MEMORABLE_RANGE: RangeInclusive<usize> = 3..=15;
+
+use core::{fmt::Display, ops::RangeInclusive};
 
 use rand::Rng;
 use ratatui::{
@@ -47,11 +48,11 @@ impl Default for PasswordType {
 }
 
 impl PasswordType {
-    fn get_range(&self) -> RangeInclusive<u32> {
+    fn get_range(&self) -> RangeInclusive<usize> {
         match self {
-            PasswordType::Pin { .. } => 3..=12,
-            PasswordType::Random { .. } => 8..=100,
-            PasswordType::Memorable { .. } => 3..=15,
+            PasswordType::Pin { .. } => PIN_RANGE,
+            PasswordType::Random { .. } => RANDOM_RANGE,
+            PasswordType::Memorable { .. } => MEMORABLE_RANGE,
         }
     }
 }
@@ -87,16 +88,18 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
 impl Default for Items<PasswordType> {
     fn default() -> Self {
         let items = vec![
-            PasswordType::Pin { length: 8 },
+            PasswordType::Pin {
+                length: *PIN_RANGE.start(),
+            },
             PasswordType::Random {
-                length: 8,
-                numbers: true,
-                symbols: true,
+                length: *RANDOM_RANGE.start(),
+                numbers: false,
+                symbols: false,
             },
             PasswordType::Memorable {
-                length: 8,
-                capitalize: true,
-                full_words: true,
+                length: *MEMORABLE_RANGE.start(),
+                capitalize: false,
+                full_words: false,
             },
         ];
 
