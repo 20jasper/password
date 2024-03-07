@@ -1,3 +1,14 @@
-fn main() {
-    println!("Hello, world!");
+mod app;
+mod panic;
+pub mod tui;
+
+use app::App;
+
+fn main() -> color_eyre::Result<()> {
+    panic::install_hooks()?;
+
+    App::default().run(&mut tui::init()?)?;
+    tui::restore()?;
+
+    Ok(())
 }
