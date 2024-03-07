@@ -1,5 +1,6 @@
 mod app;
 mod panic;
+pub mod password;
 pub mod tui;
 
 use app::App;

@@ -5,7 +5,7 @@ use ratatui::{
     widgets::{block::Title, Block, Tabs},
 };
 
-use crate::tui;
+use crate::{password, tui};
 use color_eyre::eyre::WrapErr;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
@@ -53,7 +53,7 @@ impl App {
     }
 
     fn update_password(&mut self) {
-        self.password = "*".repeat(self.length);
+        self.password = password::pin(self.length);
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -72,11 +72,11 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Title::from(" Counter App Tutorial ".bold());
+        let title = Title::from(" Password Generator ".bold());
         let instructions = Title::from(Line::from(vec![
-            " Decrement ".into(),
+            " Decrease Length ".into(),
             "<Left>".blue().bold(),
-            " Increment ".into(),
+            " Increase Length ".into(),
             "<Right>".blue().bold(),
             " Quit ".into(),
             "<Q> ".blue().bold(),
