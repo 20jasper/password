@@ -36,14 +36,10 @@ impl Default for App {
 impl App {
     pub fn run(&mut self, terminal: &mut tui::Tui) -> color_eyre::Result<()> {
         while !self.exit {
-            terminal.draw(|frame| self.render_frame(frame))?;
+            terminal.draw(|frame| ui(frame, self))?;
             self.handle_events().wrap_err("handle events failed")?;
         }
         Ok(())
-    }
-
-    fn render_frame(&self, frame: &mut Frame<'_>) {
-        frame.render_widget(self, frame.size());
     }
 
     fn exit(&mut self) {
@@ -54,7 +50,7 @@ impl App {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left | KeyCode::Char('h') => {
-                self.length = self.length.saturating_sub(1);
+                self.length = self.length.saturating_sub(1).max(6);
                 self.update_password();
             }
             KeyCode::Right | KeyCode::Char('l') => {
@@ -83,35 +79,70 @@ impl App {
     }
 }
 
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Title::from(" Password Generator ".bold());
-        let instructions = Title::from(Line::from(vec![
-            " Decrease Length ".into(),
-            "<Left>/<H>".blue().bold(),
-            " Increase Length ".into(),
-            "<Right>/<L>".blue().bold(),
-            " Quit ".into(),
-            "<Q> ".blue().bold(),
-        ]));
-        let block = Block::default()
-            .title(title.alignment(Alignment::Center))
-            .title(
-                instructions
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-            )
-            .borders(Borders::ALL)
-            .border_set(border::THICK)
-            .padding(Padding::horizontal(1));
+fn render_password_ui(frame: &mut Frame<'_>, area: Rect, app: &App) {
+    let title = Title::from(" Password Generator ".bold());
+    let instructions = Title::from(Line::from(vec![
+        " Decrease Length ".into(),
+        "<Left>/<H>".blue().bold(),
+        " Increase Length ".into(),
+        "<Right>/<L>".blue().bold(),
+        " Quit ".into(),
+        "<Q> ".blue().bold(),
+    ]));
+    let block = Block::default()
+        .title(title.alignment(Alignment::Center))
+        .title(
+            instructions
+                .alignment(Alignment::Center)
+                .position(Position::Bottom),
+        )
+        .borders(Borders::ALL)
+        .border_set(border::THICK)
+        .padding(Padding::horizontal(1));
 
-        let counter_text = Text::from(vec![
-            Line::from(vec!["Length: ".into(), self.length.to_string().yellow()]),
-            Line::from(vec!["Password: ".into(), self.password.clone().yellow()]),
-        ]);
+    let password_text = Paragraph::new(vec![
+        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
+        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
+    ])
+    .block(block);
 
-        Paragraph::new(counter_text).block(block).render(area, buf);
-    }
+    frame.render_widget(password_text, area);
+}
+
+fn render_tabs_ui(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
+    let title = Title::from(" Password Types ".bold());
+    let instructions = Title::from(Line::from(vec![
+        " Next ".into(),
+        "<Down>/<J>".blue().bold(),
+        " Last ".into(),
+        "<Up>/<K>".blue().bold(),
+    ]));
+    let block = Block::default()
+        .title(title.alignment(Alignment::Center))
+        .title(
+            instructions
+                .alignment(Alignment::Center)
+                .position(Position::Bottom),
+        )
+        .borders(Borders::ALL)
+        .border_set(border::THICK)
+        .padding(Padding::horizontal(1));
+
+    let password_text = Paragraph::new(vec![
+        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
+        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
+    ])
+    .block(block);
+
+    frame.render_widget(password_text, area);
+}
+
+fn ui(frame: &mut Frame<'_>, app: &mut App) {
+    let layout = Layout::horizontal([Constraint::Min(20), Constraint::Length(40)]);
+    let [password_area, tabs_area] = layout.areas(frame.size());
+
+    render_password_ui(frame, password_area, app);
+    render_tabs_ui(frame, tabs_area, app);
 }
 
 #[cfg(test)]
