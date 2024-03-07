@@ -9,9 +9,9 @@ use super::styled_block;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Items<T> {
-    items: Vec<T>,
+    pub items: Vec<T>,
     state: ListState,
-    selected: Option<usize>,
+    pub selected: Option<usize>,
 }
 
 impl<T> Items<T> {

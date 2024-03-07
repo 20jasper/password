@@ -12,7 +12,7 @@ use ratatui::{
 
 use super::{list::Items, styled_block, App};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub enum PasswordType {
     Pin {
         length: usize,
@@ -48,7 +48,7 @@ impl Default for PasswordType {
 }
 
 impl PasswordType {
-    fn get_range(&self) -> RangeInclusive<usize> {
+    pub fn get_range(&self) -> RangeInclusive<usize> {
         match self {
             PasswordType::Pin { .. } => PIN_RANGE,
             PasswordType::Random { .. } => RANDOM_RANGE,

@@ -54,14 +54,17 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
+        let selected = self.list_state.selected.unwrap();
+        let range = self.list_state.items[selected].get_range();
+
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left | KeyCode::Char('h') => {
-                self.length = self.length.saturating_sub(1).max(3);
+                self.length = self.length.saturating_sub(1).max(*range.start());
                 self.update_password();
             }
             KeyCode::Right | KeyCode::Char('l') => {
-                self.length = self.length.saturating_add(1).min(40);
+                self.length = self.length.saturating_add(1).min(*range.end());
                 self.update_password();
             }
             KeyCode::Down | KeyCode::Char('j') => {
