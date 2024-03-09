@@ -29,12 +29,14 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         let length = 8;
-        let password = password::pin(length);
+        let list_state = list::Items::default();
+
+        let password_type = list_state.get_selected().expect("Item should be selected");
 
         Self {
             length,
-            password,
-            list_state: list::Items::default(),
+            password: password_type.generate(length),
+            list_state,
             exit: false,
         }
     }
@@ -54,8 +56,11 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        let selected = self.list_state.selected.unwrap();
-        let range = self.list_state.items[selected].get_range();
+        let selected = self
+            .list_state
+            .get_selected()
+            .expect("item should be selected");
+        let range = selected.get_range();
 
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
@@ -69,18 +74,26 @@ impl App {
             }
             KeyCode::Down | KeyCode::Char('j') => {
                 self.list_state.next();
+                self.length = self.length.max(*range.start()).min(*range.end());
+                self.update_password();
             }
             KeyCode::Up | KeyCode::Char('k') => {
                 self.list_state.previous();
+                self.length = self.length.max(*range.start()).min(*range.end());
+                self.update_password();
             }
             _ => {}
         }
     }
 
     fn update_password(&mut self) {
-        self.password = password::pin(self.length);
-    }
+        let password_type = self
+            .list_state
+            .get_selected()
+            .expect("item should be selected");
 
+        self.password = password_type.generate(self.length);
+    }
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
             // it's important to check that the event is a key press event as

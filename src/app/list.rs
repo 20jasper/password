@@ -28,6 +28,10 @@ impl<T> Items<T> {
         self.state.select(Some(index));
     }
 
+    pub fn get_selected(&self) -> Option<&T> {
+        Some(&self.items[self.selected?])
+    }
+
     pub fn next(&mut self) {
         self.selected = self.selected.map(|x| {
             if x == self.items.len().saturating_sub(1) {
