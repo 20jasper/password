@@ -1,6 +1,5 @@
 const PIN_RANGE: RangeInclusive<usize> = 3..=12;
 const RANDOM_RANGE: RangeInclusive<usize> = 8..=100;
-const MEMORABLE_RANGE: RangeInclusive<usize> = 3..=15;
 
 const NUMBERS_RANGE: RangeInclusive<char> = '1'..='9';
 const ALPHABET_LOWER_RANGE: RangeInclusive<char> = 'a'..='z';
@@ -21,10 +20,6 @@ use super::{list::Items, styled_block, App};
 pub enum PasswordType {
     Pin,
     Random { numbers: bool, symbols: bool },
-    // Memorable {
-    //     capitalize: bool,
-    //     full_words: bool,
-    // },
 }
 
 impl Display for PasswordType {
@@ -47,9 +42,8 @@ impl Default for PasswordType {
 impl PasswordType {
     pub fn get_range(&self) -> RangeInclusive<usize> {
         match self {
-            PasswordType::Pin { .. } => PIN_RANGE,
+            PasswordType::Pin => PIN_RANGE,
             PasswordType::Random { .. } => RANDOM_RANGE,
-            // PasswordType::Memorable { .. } => MEMORABLE_RANGE,
         }
     }
     pub fn generate(&self, length: usize) -> String {
@@ -57,11 +51,7 @@ impl PasswordType {
             PasswordType::Pin => get_random_string(length, true, false, false),
             PasswordType::Random { numbers, symbols } => {
                 get_random_string(length, *numbers, *symbols, true)
-            } // PasswordType::Memorable {
-              //     length,
-              //     capitalize,
-              //     full_words,
-              // } => todo!(),
+            }
         }
     }
 }
@@ -121,11 +111,6 @@ impl Default for Items<PasswordType> {
                 numbers: false,
                 symbols: false,
             },
-            // PasswordType::Memorable {
-            //     length: *MEMORABLE_RANGE.start(),
-            //     capitalize: false,
-            //     full_words: false,
-            // },
         ];
 
         Items::new(items)
