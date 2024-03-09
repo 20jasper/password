@@ -21,9 +21,9 @@ impl PasswordType {
     pub fn generate(&self, length: usize) -> String {
         match self {
             PasswordType::Pin => get_random_string(length, true, false, false),
-            PasswordType::Random { numbers, symbols } => {
-                get_random_string(length, *numbers, *symbols, true)
-            }
+            PasswordType::Random {
+                numbers, symbols, ..
+            } => get_random_string(length, *numbers, *symbols, true),
         }
     }
 }

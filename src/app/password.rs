@@ -8,15 +8,18 @@ use core::{fmt::Display, ops::RangeInclusive};
 
 use ratatui::prelude::*;
 
+use self::options::Options;
+
 use super::{list::Items, App};
 
-#[derive(Debug, Clone, PartialEq, Eq, Copy, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum PasswordType {
     #[default]
     Pin,
     Random {
         numbers: bool,
         symbols: bool,
+        state: Items<Options>,
     },
 }
 
@@ -40,8 +43,8 @@ impl PasswordType {
     }
 }
 
-pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: PasswordType) {
-    app.update_password(password_type);
+pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: &PasswordType) {
+    app.update_password(password_type.clone());
 
     match password_type {
         PasswordType::Pin => {
@@ -63,6 +66,7 @@ impl Default for Items<PasswordType> {
         let items = vec![
             PasswordType::Pin,
             PasswordType::Random {
+                state: Items::default(),
                 numbers: true,
                 symbols: true,
             },

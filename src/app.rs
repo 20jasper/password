@@ -18,7 +18,7 @@ use ratatui::{
 
 use self::password::PasswordType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum Screens {
     Password(PasswordType),
     List,
@@ -36,7 +36,7 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         let length = 8;
-        let list_state = list::Items::default();
+        let list_state = list::Items::<PasswordType>::default();
 
         let password_type = list_state
             .get_selected()
@@ -67,7 +67,7 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match self.screen {
+        match self.screen.clone() {
             Screens::Password(password_type) => match key_event.code {
                 KeyCode::Char('q') => self.screen = Screens::List,
                 KeyCode::Left | KeyCode::Char('h') => {
@@ -90,7 +90,7 @@ impl App {
                     let selected = self
                         .list_state
                         .get_selected()
-                        .copied()
+                        .cloned()
                         .unwrap_or_default();
                     self.screen = Screens::Password(selected);
                 }
@@ -142,8 +142,8 @@ pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> 
 }
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
-    match app.screen {
-        Screens::Password(password_type) => password::ui(frame, app, password_type),
+    match app.screen.clone() {
+        Screens::Password(password_type) => password::ui(frame, app, &password_type),
         Screens::List => list::ui(frame, &mut app.list_state),
     };
 }

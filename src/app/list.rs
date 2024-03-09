@@ -1,4 +1,5 @@
 use core::fmt::Display;
+use std::string::ToString;
 
 use ratatui::{
     prelude::*,
@@ -10,7 +11,7 @@ use super::styled_block;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Items<T> {
     pub items: Vec<T>,
-    state: ListState,
+    pub state: ListState,
     pub selected: Option<usize>,
 }
 
@@ -58,8 +59,28 @@ pub fn ui(frame: &mut Frame<'_>, items: &mut Items<impl Display>) {
     render(frame, area, items);
 }
 
+pub fn styled<'a>(
+    title: &'a str,
+    instructions: Title<'a>,
+    items: &Items<impl Display>,
+) -> List<'a> {
+    let title = Title::from(title.bold());
+    let block = styled_block(title, instructions);
+
+    List::new(
+        items
+            .items
+            .iter()
+            .map(ToString::to_string),
+    )
+    .block(block)
+    .style(Style::default().fg(Color::White))
+    .highlight_style(Style::default().fg(Color::Yellow))
+    .highlight_symbol(">> ")
+    .repeat_highlight_symbol(true)
+}
+
 pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>) {
-    let title = Title::from(" Password Types ".bold());
     let instructions = Title::from(Line::from(vec![
         " Next ".into(),
         "<Down>/<J>".blue().bold(),
@@ -70,19 +91,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
         " Quit ".into(),
         "<Q> ".blue().bold(),
     ]));
-    let block = styled_block(title, instructions);
-
-    let list = List::new(
-        items
-            .items
-            .iter()
-            .map(std::string::ToString::to_string),
-    )
-    .block(block)
-    .style(Style::default().fg(Color::White))
-    .highlight_style(Style::default().fg(Color::Yellow))
-    .highlight_symbol(">> ")
-    .repeat_highlight_symbol(true);
+    let list = styled(" Password Types ", instructions, items);
 
     frame.render_stateful_widget(list, area, &mut items.state);
 }
