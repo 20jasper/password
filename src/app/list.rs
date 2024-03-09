@@ -34,13 +34,9 @@ impl<T> Items<T> {
     }
 
     pub fn next(&mut self) {
-        self.selected = self.selected.map(|x| {
-            if x == self.items.len().saturating_sub(1) {
-                0
-            } else {
-                x.saturating_add(1)
-            }
-        });
+        self.selected = self
+            .selected
+            .map(|x| x.saturating_add(1) % self.items.len());
 
         self.state.select(self.selected);
     }
@@ -48,7 +44,7 @@ impl<T> Items<T> {
     pub fn previous(&mut self) {
         self.selected = self.selected.map(|x| {
             x.wrapping_sub(1)
-                .min(self.items.len().saturating_sub(1))
+                .min(self.items.len() - 1)
         });
         self.state.select(self.selected);
     }
