@@ -105,7 +105,7 @@ impl App {
         };
     }
 
-    fn update_password(&mut self, password_type: PasswordType) {
+    fn update_password(&mut self, password_type: &PasswordType) {
         let range = password_type.get_range();
         self.length = self
             .length

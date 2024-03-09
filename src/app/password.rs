@@ -44,7 +44,7 @@ impl PasswordType {
 }
 
 pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: &PasswordType) {
-    app.update_password(password_type.clone());
+    app.update_password(password_type);
 
     match password_type {
         PasswordType::Pin => {
