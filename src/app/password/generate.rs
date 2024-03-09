@@ -1,13 +1,10 @@
-use core::{iter, ops::RangeInclusive};
+use core::iter;
 
 use rand::distributions::{Distribution, Slice, Uniform};
 use rand::prelude::Rng;
 
 use super::PasswordType;
 
-const NUMBERS_RANGE: RangeInclusive<char> = '1'..='9';
-const ALPHABET_LOWER_RANGE: RangeInclusive<char> = 'a'..='z';
-const ALPHABET_UPPER_RANGE: RangeInclusive<char> = 'A'..='Z';
 // I excluded whitespace characters and the backtick comma, and period, and quote, and backslash. [original list](https://owasp.org/www-community/password-special-characters)
 const SYMBOLS_ARR: [char; 25] = [
     '!', '#', '$', '%', '&', '(', ')', '*', '+', '-', '/', ':', ';', '<', '=', '>', '?', '@', '[',
@@ -45,11 +42,11 @@ fn get_distributions<'a>(numbers: bool, symbols: bool, letters: bool) -> Vec<Dis
     let mut ranges = vec![];
 
     if numbers {
-        ranges.push(D::Uniform(Uniform::from(NUMBERS_RANGE)));
+        ranges.push(D::Uniform(Uniform::from('1'..='9')));
     }
     if letters {
-        ranges.push(D::Uniform(Uniform::from(ALPHABET_LOWER_RANGE)));
-        ranges.push(D::Uniform(Uniform::from(ALPHABET_UPPER_RANGE)));
+        ranges.push(D::Uniform(Uniform::from('a'..='z')));
+        ranges.push(D::Uniform(Uniform::from('A'..='Z')));
     }
     if symbols {
         let dist = Slice::new(&SYMBOLS_ARR).expect("slice shouldn't be empty");
