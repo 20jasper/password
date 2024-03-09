@@ -51,7 +51,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
         "<Left>/<H>".blue().bold(),
         " Increase Length ".into(),
         "<Right>/<L>".blue().bold(),
-        " Quit ".into(),
+        " Back to List ".into(),
         "<Q> ".blue().bold(),
     ]));
     let block = styled_block(title, instructions);

@@ -74,13 +74,31 @@ impl App {
         let range = selected.get_range();
 
         match self.screen {
-            Screens::Password(x) => {
-                dbg!(x);
-            }
+            Screens::Password(_) => match key_event.code {
+                KeyCode::Char('q') => self.screen = Screens::List,
+                KeyCode::Left | KeyCode::Char('h') => {
+                    self.length = self
+                        .length
+                        .saturating_sub(1)
+                        .max(*range.start());
+                    self.update_password();
+                }
+                KeyCode::Right | KeyCode::Char('l') => {
+                    self.length = self
+                        .length
+                        .saturating_add(1)
+                        .min(*range.end());
+                    self.update_password();
+                }
+                _ => {}
+            },
             Screens::List => match key_event.code {
                 KeyCode::Char('q') => self.exit(),
                 KeyCode::Enter | KeyCode::Char(' ') => {
                     self.screen = Screens::Password(*self.list_state.get_selected().unwrap());
+                    self.length = self
+                        .length
+                        .clamp(*range.start(), *range.end());
                     self.update_password();
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
@@ -91,25 +109,7 @@ impl App {
                 }
                 _ => {}
             },
-        }
-
-        match key_event.code {
-            KeyCode::Left | KeyCode::Char('h') => {
-                self.length = self
-                    .length
-                    .saturating_sub(1)
-                    .max(*range.start());
-                self.update_password();
-            }
-            KeyCode::Right | KeyCode::Char('l') => {
-                self.length = self
-                    .length
-                    .saturating_add(1)
-                    .min(*range.end());
-                self.update_password();
-            }
-            _ => {}
-        }
+        };
     }
 
     fn update_password(&mut self) {
@@ -150,14 +150,9 @@ pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> 
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
     match app.screen {
-        Screens::Password(pass) => todo!("{:?}", pass),
+        Screens::Password(_) => password::render(frame, frame.size(), app),
         Screens::List => list::render(frame, frame.size(), &mut app.list_state),
     };
-    // let layout = Layout::horizontal([Constraint::Min(63), Constraint::Length(40)]);
-    // let [password_area, tabs_area] = layout.areas(frame.size());
-
-    // password::render(frame, password_area, app);
-    // list::render(frame, tabs_area, &mut app.list_state);
 }
 
 #[cfg(test)]
