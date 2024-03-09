@@ -45,8 +45,41 @@ impl PasswordType {
 pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: PasswordType) {
     app.update_password(password_type);
 
-    let area = frame.size();
-    render_generator(frame, area, app);
+    match password_type {
+        PasswordType::Pin => {
+            render_generator(frame, frame.size(), app);
+        }
+        PasswordType::Random { .. } => {
+            let [generator_area, options_area] =
+                Layout::horizontal([Constraint::Min(80), Constraint::Length(60)])
+                    .areas(frame.size());
+
+            render_generator(frame, generator_area, app);
+            render_options(frame, options_area, app);
+        }
+    }
+}
+
+fn render_options(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
+    let title = Title::from(" Options ".bold());
+    let instructions = Title::from(Line::from(vec![
+        " Next ".into(),
+        "<Down>/<J>".blue().bold(),
+        " Last ".into(),
+        "<Up>/<K>".blue().bold(),
+        " Select ".into(),
+        "<Enter>/<Space>".blue().bold(),
+    ]));
+    let block = styled_block(title, instructions);
+
+    let password_text = Paragraph::new(vec![
+        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
+        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
+    ])
+    .wrap(Wrap { trim: true })
+    .block(block);
+
+    frame.render_widget(password_text, area);
 }
 
 fn render_generator(frame: &mut Frame<'_>, area: Rect, app: &App) {
