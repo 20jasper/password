@@ -43,8 +43,8 @@ impl PasswordType {
 }
 
 pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: PasswordType) {
-    // match &app. {
-    // }
+    app.update_password(password_type);
+
     let area = frame.size();
     render_generator(frame, area, app);
 }

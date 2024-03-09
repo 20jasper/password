@@ -75,14 +75,12 @@ impl App {
                         .length
                         .saturating_sub(1)
                         .max(*password_type.get_range().start());
-                    self.update_password(password_type);
                 }
                 KeyCode::Right | KeyCode::Char('l') => {
                     self.length = self
                         .length
                         .saturating_add(1)
                         .min(*password_type.get_range().end());
-                    self.update_password(password_type);
                 }
                 _ => {}
             },
@@ -95,7 +93,6 @@ impl App {
                         .copied()
                         .unwrap_or_default();
                     self.screen = Screens::Password(selected);
-                    self.update_password(selected);
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
                     self.list_state.next();
