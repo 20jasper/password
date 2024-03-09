@@ -2,6 +2,12 @@ use core::iter;
 
 use rand::distributions::{Distribution, Slice, Uniform};
 use rand::prelude::Rng;
+use ratatui::{
+    prelude::{Frame, *},
+    widgets::{block::Title, Paragraph, Wrap},
+};
+
+use crate::app::{styled_block, App};
 
 use super::PasswordType;
 
@@ -68,4 +74,26 @@ fn get_random_string(length: usize, numbers: bool, symbols: bool, letters: bool)
         .map(|i| distributions[i].sample(&mut rand::thread_rng()))
         .take(length)
         .collect::<String>()
+}
+
+pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
+    let title = Title::from(" Password Generator ".bold());
+    let instructions = Title::from(Line::from(vec![
+        " Decrease Length ".into(),
+        "<Left>/<H>".blue().bold(),
+        " Increase Length ".into(),
+        "<Right>/<L>".blue().bold(),
+        " Back to List ".into(),
+        "<Q> ".blue().bold(),
+    ]));
+    let block = styled_block(title, instructions);
+
+    let password_text = Paragraph::new(vec![
+        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
+        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
+    ])
+    .wrap(Wrap { trim: true })
+    .block(block);
+
+    frame.render_widget(password_text, area);
 }

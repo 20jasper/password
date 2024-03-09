@@ -1,16 +1,14 @@
 const PIN_RANGE: RangeInclusive<usize> = 3..=12;
 const RANDOM_RANGE: RangeInclusive<usize> = 8..=100;
 
-mod generate;
+pub mod generate;
+pub mod options;
 
 use core::{fmt::Display, ops::RangeInclusive};
 
-use ratatui::{
-    prelude::*,
-    widgets::{block::Title, Paragraph, Wrap},
-};
+use ratatui::prelude::*;
 
-use super::{list::Items, styled_block, App};
+use super::{list::Items, App};
 
 #[derive(Debug, Clone, PartialEq, Eq, Copy, Default)]
 pub enum PasswordType {
@@ -47,61 +45,17 @@ pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: PasswordType) {
 
     match password_type {
         PasswordType::Pin => {
-            render_generator(frame, frame.size(), app);
+            generate::render(frame, frame.size(), app);
         }
         PasswordType::Random { .. } => {
             let [generator_area, options_area] =
                 Layout::horizontal([Constraint::Min(80), Constraint::Length(60)])
                     .areas(frame.size());
 
-            render_generator(frame, generator_area, app);
-            render_options(frame, options_area, app);
+            generate::render(frame, generator_area, app);
+            options::render(frame, options_area, app);
         }
     }
-}
-
-fn render_options(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
-    let title = Title::from(" Options ".bold());
-    let instructions = Title::from(Line::from(vec![
-        " Next ".into(),
-        "<Down>/<J>".blue().bold(),
-        " Last ".into(),
-        "<Up>/<K>".blue().bold(),
-        " Select ".into(),
-        "<Enter>/<Space>".blue().bold(),
-    ]));
-    let block = styled_block(title, instructions);
-
-    let password_text = Paragraph::new(vec![
-        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
-        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
-    ])
-    .wrap(Wrap { trim: true })
-    .block(block);
-
-    frame.render_widget(password_text, area);
-}
-
-fn render_generator(frame: &mut Frame<'_>, area: Rect, app: &App) {
-    let title = Title::from(" Password Generator ".bold());
-    let instructions = Title::from(Line::from(vec![
-        " Decrease Length ".into(),
-        "<Left>/<H>".blue().bold(),
-        " Increase Length ".into(),
-        "<Right>/<L>".blue().bold(),
-        " Back to List ".into(),
-        "<Q> ".blue().bold(),
-    ]));
-    let block = styled_block(title, instructions);
-
-    let password_text = Paragraph::new(vec![
-        Line::from(vec!["Length: ".into(), app.length.to_string().yellow()]),
-        Line::from(vec!["Password: ".into(), app.password.clone().yellow()]),
-    ])
-    .wrap(Wrap { trim: true })
-    .block(block);
-
-    frame.render_widget(password_text, area);
 }
 
 impl Default for Items<PasswordType> {
