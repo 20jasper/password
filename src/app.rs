@@ -19,10 +19,17 @@ use ratatui::{
 use self::password::PasswordType;
 
 #[derive(Debug)]
+enum Screens {
+    Password(PasswordType),
+    List,
+}
+
+#[derive(Debug)]
 pub struct App {
     length: usize,
     password: String,
     list_state: list::Items<PasswordType>,
+    screen: Screens,
     exit: bool,
 }
 
@@ -39,6 +46,7 @@ impl Default for App {
             length,
             password: password_type.generate(length),
             list_state,
+            screen: Screens::List,
             exit: false,
         }
     }
@@ -65,8 +73,27 @@ impl App {
             .expect("item should be selected");
         let range = selected.get_range();
 
+        match self.screen {
+            Screens::Password(x) => {
+                dbg!(x);
+            }
+            Screens::List => match key_event.code {
+                KeyCode::Char('q') => self.exit(),
+                KeyCode::Enter | KeyCode::Char(' ') => {
+                    self.screen = Screens::Password(*self.list_state.get_selected().unwrap());
+                    self.update_password();
+                }
+                KeyCode::Down | KeyCode::Char('j') => {
+                    self.list_state.next();
+                }
+                KeyCode::Up | KeyCode::Char('k') => {
+                    self.list_state.previous();
+                }
+                _ => {}
+            },
+        }
+
         match key_event.code {
-            KeyCode::Char('q') => self.exit(),
             KeyCode::Left | KeyCode::Char('h') => {
                 self.length = self
                     .length
@@ -78,22 +105,6 @@ impl App {
                 self.length = self
                     .length
                     .saturating_add(1)
-                    .min(*range.end());
-                self.update_password();
-            }
-            KeyCode::Down | KeyCode::Char('j') => {
-                self.list_state.next();
-                self.length = self
-                    .length
-                    .max(*range.start())
-                    .min(*range.end());
-                self.update_password();
-            }
-            KeyCode::Up | KeyCode::Char('k') => {
-                self.list_state.previous();
-                self.length = self
-                    .length
-                    .max(*range.start())
                     .min(*range.end());
                 self.update_password();
             }
@@ -138,11 +149,15 @@ pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> 
 }
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
-    let layout = Layout::horizontal([Constraint::Min(63), Constraint::Length(40)]);
-    let [password_area, tabs_area] = layout.areas(frame.size());
+    match app.screen {
+        Screens::Password(pass) => todo!("{:?}", pass),
+        Screens::List => list::render(frame, frame.size(), &mut app.list_state),
+    };
+    // let layout = Layout::horizontal([Constraint::Min(63), Constraint::Length(40)]);
+    // let [password_area, tabs_area] = layout.areas(frame.size());
 
-    password::render(frame, password_area, app);
-    list::render(frame, tabs_area, &mut app.list_state);
+    // password::render(frame, password_area, app);
+    // list::render(frame, tabs_area, &mut app.list_state);
 }
 
 #[cfg(test)]

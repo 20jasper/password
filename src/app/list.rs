@@ -53,6 +53,11 @@ impl<T> Items<T> {
     }
 }
 
+pub fn ui(frame: &mut Frame<'_>, items: &mut Items<impl Display>) {
+    let area = frame.size();
+    render(frame, area, items);
+}
+
 pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>) {
     let title = Title::from(" Password Types ".bold());
     let instructions = Title::from(Line::from(vec![
@@ -60,6 +65,10 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
         "<Down>/<J>".blue().bold(),
         " Last ".into(),
         "<Up>/<K>".blue().bold(),
+        " Select ".into(),
+        "<Enter>/<Space>".blue().bold(),
+        " Quit ".into(),
+        "<Q> ".blue().bold(),
     ]));
     let block = styled_block(title, instructions);
 
