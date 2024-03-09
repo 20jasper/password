@@ -82,6 +82,60 @@ impl App {
                         .saturating_add(1)
                         .min(*password_type.get_range().end());
                 }
+                KeyCode::Down | KeyCode::Char('j') => {
+                    if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
+                        self.screen
+                    {
+                        state.next();
+                    }
+                }
+                KeyCode::Up | KeyCode::Char('k') => {
+                    if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
+                        self.screen
+                    {
+                        state.previous();
+                    }
+                }
+                KeyCode::Enter | KeyCode::Char(' ') => {
+                    if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
+                        self.screen
+                    {
+                        let selected = state
+                            .get_selected()
+                            .expect("should be at least one option");
+
+                        match selected {
+                            password::options::Options::Numbers(_) => {
+                                if let PasswordType::Random {
+                                    numbers,
+                                    symbols,
+                                    state,
+                                } = &password_type
+                                {
+                                    self.screen = Screens::Password(PasswordType::Random {
+                                        numbers: !numbers,
+                                        symbols: *symbols,
+                                        state: state.clone(),
+                                    });
+                                }
+                            }
+                            password::options::Options::Symbols(_) => {
+                                if let PasswordType::Random {
+                                    numbers,
+                                    symbols,
+                                    state,
+                                } = &password_type
+                                {
+                                    self.screen = Screens::Password(PasswordType::Random {
+                                        numbers: *numbers,
+                                        symbols: !symbols,
+                                        state: state.clone(),
+                                    });
+                                }
+                            }
+                        };
+                    };
+                }
                 _ => {}
             },
             Screens::List => match key_event.code {
