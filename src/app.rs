@@ -67,39 +67,35 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        let selected = self
-            .list_state
-            .get_selected()
-            .expect("item should be selected");
-        let range = selected.get_range();
-
         match self.screen {
-            Screens::Password(_) => match key_event.code {
+            Screens::Password(password_type) => match key_event.code {
                 KeyCode::Char('q') => self.screen = Screens::List,
                 KeyCode::Left | KeyCode::Char('h') => {
                     self.length = self
                         .length
                         .saturating_sub(1)
-                        .max(*range.start());
-                    self.update_password();
+                        .max(*password_type.get_range().start());
+                    self.update_password(password_type);
                 }
                 KeyCode::Right | KeyCode::Char('l') => {
                     self.length = self
                         .length
                         .saturating_add(1)
-                        .min(*range.end());
-                    self.update_password();
+                        .min(*password_type.get_range().end());
+                    self.update_password(password_type);
                 }
                 _ => {}
             },
             Screens::List => match key_event.code {
                 KeyCode::Char('q') => self.exit(),
                 KeyCode::Enter | KeyCode::Char(' ') => {
-                    self.screen = Screens::Password(*self.list_state.get_selected().unwrap());
-                    self.length = self
-                        .length
-                        .clamp(*range.start(), *range.end());
-                    self.update_password();
+                    let selected = self
+                        .list_state
+                        .get_selected()
+                        .copied()
+                        .unwrap_or_default();
+                    self.screen = Screens::Password(selected);
+                    self.update_password(selected);
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
                     self.list_state.next();
@@ -112,11 +108,11 @@ impl App {
         };
     }
 
-    fn update_password(&mut self) {
-        let password_type = self
-            .list_state
-            .get_selected()
-            .expect("item should be selected");
+    fn update_password(&mut self, password_type: PasswordType) {
+        let range = password_type.get_range();
+        self.length = self
+            .length
+            .clamp(*range.start(), *range.end());
 
         self.password = password_type.generate(self.length);
     }
@@ -150,8 +146,8 @@ pub fn styled_block<'a>(title: Title<'a>, instructions: Title<'a>) -> Block<'a> 
 
 fn ui(frame: &mut Frame<'_>, app: &mut App) {
     match app.screen {
-        Screens::Password(_) => password::render(frame, frame.size(), app),
-        Screens::List => list::render(frame, frame.size(), &mut app.list_state),
+        Screens::Password(password_type) => password::ui(frame, app, password_type),
+        Screens::List => list::ui(frame, &mut app.list_state),
     };
 }
 

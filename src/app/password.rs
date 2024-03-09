@@ -12,10 +12,14 @@ use ratatui::{
 
 use super::{list::Items, styled_block, App};
 
-#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy, Default)]
 pub enum PasswordType {
+    #[default]
     Pin,
-    Random { numbers: bool, symbols: bool },
+    Random {
+        numbers: bool,
+        symbols: bool,
+    },
 }
 
 impl Display for PasswordType {
@@ -29,12 +33,6 @@ impl Display for PasswordType {
     }
 }
 
-impl Default for PasswordType {
-    fn default() -> Self {
-        Self::Pin
-    }
-}
-
 impl PasswordType {
     pub fn get_range(&self) -> RangeInclusive<usize> {
         match self {
@@ -44,7 +42,14 @@ impl PasswordType {
     }
 }
 
-pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
+pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: PasswordType) {
+    // match &app. {
+    // }
+    let area = frame.size();
+    render_generator(frame, area, app);
+}
+
+fn render_generator(frame: &mut Frame<'_>, area: Rect, app: &App) {
     let title = Title::from(" Password Generator ".bold());
     let instructions = Title::from(Line::from(vec![
         " Decrease Length ".into(),
