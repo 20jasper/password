@@ -24,7 +24,7 @@ impl Display for PasswordType {
             PasswordType::Pin => write!(f, "Pin"),
             PasswordType::Random { .. } => {
                 write!(f, "Random")
-            } // PasswordType::Memorable { .. } => write!(f, "Memorable"),
+            }
         }
     }
 }
