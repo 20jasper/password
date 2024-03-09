@@ -31,7 +31,9 @@ impl Default for App {
         let length = 8;
         let list_state = list::Items::default();
 
-        let password_type = list_state.get_selected().expect("Item should be selected");
+        let password_type = list_state
+            .get_selected()
+            .expect("Item should be selected");
 
         Self {
             length,
@@ -46,7 +48,8 @@ impl App {
     pub fn run(&mut self, terminal: &mut tui::Tui) -> color_eyre::Result<()> {
         while !self.exit {
             terminal.draw(|frame| ui(frame, self))?;
-            self.handle_events().wrap_err("handle events failed")?;
+            self.handle_events()
+                .wrap_err("handle events failed")?;
         }
         Ok(())
     }
@@ -65,21 +68,33 @@ impl App {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Left | KeyCode::Char('h') => {
-                self.length = self.length.saturating_sub(1).max(*range.start());
+                self.length = self
+                    .length
+                    .saturating_sub(1)
+                    .max(*range.start());
                 self.update_password();
             }
             KeyCode::Right | KeyCode::Char('l') => {
-                self.length = self.length.saturating_add(1).min(*range.end());
+                self.length = self
+                    .length
+                    .saturating_add(1)
+                    .min(*range.end());
                 self.update_password();
             }
             KeyCode::Down | KeyCode::Char('j') => {
                 self.list_state.next();
-                self.length = self.length.max(*range.start()).min(*range.end());
+                self.length = self
+                    .length
+                    .max(*range.start())
+                    .min(*range.end());
                 self.update_password();
             }
             KeyCode::Up | KeyCode::Char('k') => {
                 self.list_state.previous();
-                self.length = self.length.max(*range.start()).min(*range.end());
+                self.length = self
+                    .length
+                    .max(*range.start())
+                    .min(*range.end());
                 self.update_password();
             }
             _ => {}

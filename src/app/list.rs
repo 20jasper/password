@@ -45,9 +45,10 @@ impl<T> Items<T> {
     }
 
     pub fn previous(&mut self) {
-        self.selected = self
-            .selected
-            .map(|x| x.wrapping_sub(1).min(self.items.len().saturating_sub(1)));
+        self.selected = self.selected.map(|x| {
+            x.wrapping_sub(1)
+                .min(self.items.len().saturating_sub(1))
+        });
         self.state.select(self.selected);
     }
 }
@@ -62,12 +63,17 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
     ]));
     let block = styled_block(title, instructions);
 
-    let list = List::new(items.items.iter().map(std::string::ToString::to_string))
-        .block(block)
-        .style(Style::default().fg(Color::White))
-        .highlight_style(Style::default().fg(Color::Yellow))
-        .highlight_symbol(">> ")
-        .repeat_highlight_symbol(true);
+    let list = List::new(
+        items
+            .items
+            .iter()
+            .map(std::string::ToString::to_string),
+    )
+    .block(block)
+    .style(Style::default().fg(Color::White))
+    .highlight_style(Style::default().fg(Color::Yellow))
+    .highlight_symbol(">> ")
+    .repeat_highlight_symbol(true);
 
     frame.render_stateful_widget(list, area, &mut items.state);
 }
