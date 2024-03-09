@@ -12,7 +12,6 @@ use super::styled_block;
 pub struct Items<T> {
     pub items: Vec<T>,
     pub state: ListState,
-    pub selected: Option<usize>,
 }
 
 impl<T> Items<T> {
@@ -20,33 +19,32 @@ impl<T> Items<T> {
         Self {
             items,
             state: ListState::default().with_selected(Some(0)),
-            selected: Some(0),
         }
     }
 
     pub fn select(&mut self, index: usize) {
-        self.selected = Some(index);
         self.state.select(Some(index));
     }
 
     pub fn get_selected(&self) -> Option<&T> {
-        Some(&self.items[self.selected?])
+        Some(&self.items[self.state.selected()?])
     }
 
     pub fn next(&mut self) {
-        self.selected = self
-            .selected
+        let next = self
+            .state
+            .selected()
             .map(|x| x.saturating_add(1) % self.items.len());
 
-        self.state.select(self.selected);
+        self.state.select(next);
     }
 
     pub fn previous(&mut self) {
-        self.selected = self.selected.map(|x| {
+        let previous = self.state.selected().map(|x| {
             x.wrapping_sub(1)
                 .min(self.items.len() - 1)
         });
-        self.state.select(self.selected);
+        self.state.select(previous);
     }
 }
 
