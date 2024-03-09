@@ -1,14 +1,10 @@
 const PIN_RANGE: RangeInclusive<usize> = 3..=12;
 const RANDOM_RANGE: RangeInclusive<usize> = 8..=100;
 
-const NUMBERS_RANGE: RangeInclusive<char> = '1'..='9';
-const ALPHABET_LOWER_RANGE: RangeInclusive<char> = 'a'..='z';
-const ALPHABET_UPPER_RANGE: RangeInclusive<char> = 'A'..='Z';
-const SYMBOLS_RANGE: RangeInclusive<char> = '!'..='/';
+mod generate;
 
-use core::{fmt::Display, iter, ops::RangeInclusive};
+use core::{fmt::Display, ops::RangeInclusive};
 
-use rand::Rng;
 use ratatui::{
     prelude::*,
     widgets::{block::Title, Paragraph, Wrap},
@@ -46,39 +42,6 @@ impl PasswordType {
             PasswordType::Random { .. } => RANDOM_RANGE,
         }
     }
-    pub fn generate(&self, length: usize) -> String {
-        match self {
-            PasswordType::Pin => get_random_string(length, true, false, false),
-            PasswordType::Random { numbers, symbols } => {
-                get_random_string(length, *numbers, *symbols, true)
-            }
-        }
-    }
-}
-
-pub fn generate_random(length: usize, numbers: bool, symbols: bool, letters: bool) -> String {
-    get_random_string(length, numbers, symbols, letters)
-}
-
-/// generates a random string of length `length` with at least one character
-/// from each of the options marked true
-fn get_random_string(length: usize, numbers: bool, symbols: bool, letters: bool) -> String {
-    let mut ranges = vec![];
-    if numbers {
-        ranges.push(NUMBERS_RANGE);
-    }
-    if letters {
-        ranges.push(ALPHABET_LOWER_RANGE);
-        ranges.push(ALPHABET_UPPER_RANGE);
-    }
-
-    (0..ranges.len())
-        .chain(iter::from_fn(|| {
-            Some(rand::thread_rng().gen_range(0..ranges.len()))
-        }))
-        .map(|i| rand::thread_rng().gen_range(ranges[i].clone()))
-        .take(length)
-        .collect::<String>()
 }
 
 pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
@@ -108,8 +71,8 @@ impl Default for Items<PasswordType> {
         let items = vec![
             PasswordType::Pin,
             PasswordType::Random {
-                numbers: false,
-                symbols: false,
+                numbers: true,
+                symbols: true,
             },
         ];
 
