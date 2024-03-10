@@ -4,7 +4,7 @@ use std::string::ToString;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     prelude::*,
-    widgets::{block::Title, List, ListState},
+    widgets::{block::Title, List, ListItem, ListState},
 };
 
 use super::styled_block;
@@ -66,25 +66,20 @@ pub fn ui(frame: &mut Frame<'_>, items: &mut Items<impl Display>) {
     render(frame, area, items);
 }
 
-pub fn styled<'a>(
-    title: &'a str,
-    instructions: Title<'a>,
-    items: &Items<impl Display>,
-) -> List<'a> {
+pub fn styled<'a, T>(title: &'a str, instructions: Title<'a>, items: T) -> List<'a>
+where
+    T: IntoIterator,
+    T::Item: Into<ListItem<'a>>,
+{
     let title = Title::from(title.bold());
     let block = styled_block(title, instructions);
 
-    List::new(
-        items
-            .items
-            .iter()
-            .map(ToString::to_string),
-    )
-    .block(block)
-    .style(Style::default().fg(Color::White))
-    .highlight_style(Style::default().fg(Color::Yellow))
-    .highlight_symbol(">> ")
-    .repeat_highlight_symbol(true)
+    List::new(items)
+        .block(block)
+        .style(Style::default().fg(Color::White))
+        .highlight_style(Style::default().fg(Color::Yellow))
+        .highlight_symbol(">> ")
+        .repeat_highlight_symbol(true)
 }
 
 pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>) {
@@ -98,7 +93,14 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
         " Quit ".into(),
         "<Q> ".blue().bold(),
     ]));
-    let list = styled(" Password Types ", instructions, items);
+    let list = styled(
+        " Password Types ",
+        instructions,
+        items
+            .items
+            .iter()
+            .map(|x| x.to_string()),
+    );
 
     frame.render_stateful_widget(list, area, &mut items.state);
 }

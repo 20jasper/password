@@ -1,4 +1,5 @@
 use core::fmt::{self, Display};
+use std::string::ToString;
 
 use super::PasswordType;
 use crate::app::list::{self, Items};
@@ -34,7 +35,11 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
     ]));
 
     if let Screens::Password(PasswordType::Random { state, .. }) = &mut app.screen {
-        let list = list::styled(" Options ", instructions, state);
+        let items = state
+            .items
+            .iter()
+            .map(ToString::to_string);
+        let list = list::styled(" Options ", instructions, items);
         frame.render_stateful_widget(list, area, &mut state.state);
     }
 }
