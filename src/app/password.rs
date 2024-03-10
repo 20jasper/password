@@ -6,6 +6,7 @@ pub mod options;
 
 use core::{fmt::Display, ops::RangeInclusive};
 
+use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
 
 use self::options::Options;
@@ -39,6 +40,27 @@ impl PasswordType {
         match self {
             PasswordType::Pin => PIN_RANGE,
             PasswordType::Random { .. } => RANDOM_RANGE,
+        }
+    }
+    pub fn handle_toggle(&mut self) {
+        if let PasswordType::Random {
+            state,
+            numbers,
+            symbols,
+        } = self
+        {
+            let selected = state
+                .get_selected()
+                .expect("should be at least one option");
+
+            match selected {
+                Options::Numbers => {
+                    *numbers = !*numbers;
+                }
+                Options::Symbols => {
+                    *symbols = !*symbols;
+                }
+            }
         }
     }
 }

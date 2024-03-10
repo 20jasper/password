@@ -90,46 +90,9 @@ impl App {
                     }
                 }
                 KeyCode::Enter | KeyCode::Char(' ') => {
-                    if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
-                        self.screen
-                    {
-                        use password::options::Options;
-
-                        let selected = state
-                            .get_selected()
-                            .expect("should be at least one option");
-
-                        match selected {
-                            Options::Numbers => {
-                                if let PasswordType::Random {
-                                    numbers,
-                                    symbols,
-                                    state,
-                                } = &password_type
-                                {
-                                    self.screen = Screens::Password(PasswordType::Random {
-                                        numbers: !numbers,
-                                        symbols: *symbols,
-                                        state: state.clone(),
-                                    });
-                                }
-                            }
-                            Options::Symbols => {
-                                if let PasswordType::Random {
-                                    numbers,
-                                    symbols,
-                                    state,
-                                } = &password_type
-                                {
-                                    self.screen = Screens::Password(PasswordType::Random {
-                                        numbers: *numbers,
-                                        symbols: !symbols,
-                                        state: state.clone(),
-                                    });
-                                }
-                            }
-                        };
-                    };
+                    if let Screens::Password(ref mut password_type) = self.screen {
+                        password_type.handle_toggle();
+                    }
                 }
                 _ => {}
             },
