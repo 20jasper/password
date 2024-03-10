@@ -30,7 +30,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         " Last ".into(),
         "<Up>/<K>".blue().bold(),
         " Toggle Option ".into(),
-        "<Enter>/<Space>".blue().bold(),
+        "<Enter>/<Space> ".blue().bold(),
     ]));
 
     if let Screens::Password(PasswordType::Random {

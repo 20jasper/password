@@ -99,7 +99,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
         items
             .items
             .iter()
-            .map(|x| x.to_string()),
+            .map(ToString::to_string),
     );
 
     frame.render_stateful_widget(list, area, &mut items.state);

@@ -52,7 +52,7 @@ pub fn ui(frame: &mut Frame<'_>, app: &mut App, password_type: &PasswordType) {
         }
         PasswordType::Random { .. } => {
             let [generator_area, options_area] =
-                Layout::horizontal([Constraint::Min(80), Constraint::Length(60)])
+                Layout::horizontal([Constraint::Min(80), Constraint::Length(63)])
                     .areas(frame.size());
 
             generate::render(frame, generator_area, app);
