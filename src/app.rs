@@ -82,18 +82,11 @@ impl App {
                         .saturating_add(1)
                         .min(*password_type.get_range().end());
                 }
-                KeyCode::Down | KeyCode::Char('j') => {
+                KeyCode::Down | KeyCode::Char('j' | 'k') | KeyCode::Up => {
                     if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
                         self.screen
                     {
-                        state.next();
-                    }
-                }
-                KeyCode::Up | KeyCode::Char('k') => {
-                    if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
-                        self.screen
-                    {
-                        state.previous();
+                        state.handle_key_event(key_event);
                     }
                 }
                 KeyCode::Enter | KeyCode::Char(' ') => {
@@ -148,11 +141,9 @@ impl App {
                         .unwrap_or_default();
                     self.screen = Screens::Password(selected);
                 }
-                KeyCode::Down | KeyCode::Char('j') => {
-                    self.list_state.next();
-                }
-                KeyCode::Up | KeyCode::Char('k') => {
-                    self.list_state.previous();
+                KeyCode::Down | KeyCode::Char('j' | 'k') | KeyCode::Up => {
+                    self.list_state
+                        .handle_key_event(key_event);
                 }
                 _ => {}
             },

@@ -1,6 +1,7 @@
 use core::fmt::Display;
 use std::string::ToString;
 
+use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     prelude::*,
     widgets::{block::Title, List, ListState},
@@ -45,6 +46,18 @@ impl<T> Items<T> {
                 .min(self.items.len() - 1)
         });
         self.state.select(previous);
+    }
+
+    pub fn handle_key_event(&mut self, event: KeyEvent) {
+        match event.code {
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.next();
+            }
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.previous();
+            }
+            _ => {}
+        }
     }
 }
 
