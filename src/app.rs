@@ -93,12 +93,14 @@ impl App {
                     if let Screens::Password(PasswordType::Random { ref mut state, .. }) =
                         self.screen
                     {
+                        use password::options::Options;
+
                         let selected = state
                             .get_selected()
                             .expect("should be at least one option");
 
                         match selected {
-                            password::options::Options::Numbers(_) => {
+                            Options::Numbers => {
                                 if let PasswordType::Random {
                                     numbers,
                                     symbols,
@@ -112,7 +114,7 @@ impl App {
                                     });
                                 }
                             }
-                            password::options::Options::Symbols(_) => {
+                            Options::Symbols => {
                                 if let PasswordType::Random {
                                     numbers,
                                     symbols,

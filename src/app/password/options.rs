@@ -1,5 +1,4 @@
 use core::fmt::{self, Display};
-use std::string::ToString;
 
 use super::PasswordType;
 use crate::app::list::{self, Items};
@@ -11,15 +10,15 @@ use ratatui::{
 
 #[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub enum Options {
-    Numbers(bool),
-    Symbols(bool),
+    Numbers,
+    Symbols,
 }
 
 impl Display for Options {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Options::Numbers(b) => write!(f, "Numbers: {b}"),
-            Options::Symbols(b) => write!(f, "Symbols: {b}"),
+            Options::Numbers => write!(f, "Numbers"),
+            Options::Symbols => write!(f, "Symbols"),
         }
     }
 }
@@ -30,7 +29,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         "<Down>/<J>".blue().bold(),
         " Last ".into(),
         "<Up>/<K>".blue().bold(),
-        " Select ".into(),
+        " Toggle Option ".into(),
         "<Enter>/<Space>".blue().bold(),
     ]));
 
@@ -38,7 +37,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         let items = state
             .items
             .iter()
-            .map(ToString::to_string);
+            .map(|x| format!("{x}: hi"));
         let list = list::styled(" Options ", instructions, items);
         frame.render_stateful_widget(list, area, &mut state.state);
     }
@@ -46,7 +45,7 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
 
 impl Default for Items<Options> {
     fn default() -> Self {
-        let items = vec![Options::Numbers(true), Options::Symbols(true)];
+        let items = vec![Options::Numbers, Options::Symbols];
 
         Items::new(items)
     }
