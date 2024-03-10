@@ -6,7 +6,6 @@ pub mod options;
 
 use core::{fmt::Display, ops::RangeInclusive};
 
-use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
 
 use self::options::Options;
