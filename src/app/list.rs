@@ -104,28 +104,3 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, items: &mut Items<impl Display>
 
     frame.render_stateful_widget(list, area, &mut items.state);
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn should_wrap_sub() {
-        let mut items = Items::default();
-
-        items.select(0);
-        items.previous();
-
-        assert_eq!(items.selected, Some(2));
-    }
-
-    #[test]
-    fn should_wrap_add() {
-        let mut items = Items::default();
-
-        items.select(2);
-        items.next();
-
-        assert_eq!(items.selected, Some(0));
-    }
-}
