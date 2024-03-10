@@ -33,11 +33,19 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &mut App) {
         "<Enter>/<Space>".blue().bold(),
     ]));
 
-    if let Screens::Password(PasswordType::Random { state, .. }) = &mut app.screen {
-        let items = state
-            .items
-            .iter()
-            .map(|x| format!("{x}: hi"));
+    if let Screens::Password(PasswordType::Random {
+        state,
+        numbers,
+        symbols,
+    }) = &mut app.screen
+    {
+        let items = state.items.iter().map(|option| {
+            let b = match option {
+                Options::Numbers => *numbers,
+                Options::Symbols => *symbols,
+            };
+            format!("{option}: {b}")
+        });
         let list = list::styled(" Options ", instructions, items);
         frame.render_stateful_widget(list, area, &mut state.state);
     }
