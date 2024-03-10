@@ -48,7 +48,7 @@ fn get_distributions<'a>(numbers: bool, symbols: bool, letters: bool) -> Vec<Dis
     let mut ranges = vec![];
 
     if numbers {
-        ranges.push(D::Uniform(Uniform::from('1'..='9')));
+        ranges.push(D::Uniform(Uniform::from('0'..='9')));
     }
     if letters {
         ranges.push(D::Uniform(Uniform::from('a'..='z')));
