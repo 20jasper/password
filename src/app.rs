@@ -9,6 +9,7 @@ use ratatui::{
 };
 
 use crate::tui;
+use clipboard_rs::{Clipboard, ClipboardContext};
 use color_eyre::eyre::WrapErr;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
@@ -93,6 +94,11 @@ impl App {
                     if let Screens::Password(ref mut password_type) = self.screen {
                         password_type.handle_toggle();
                     }
+                }
+                KeyCode::Char('y' | 'c') => {
+                    drop(
+                        ClipboardContext::new().and_then(|ctx| ctx.set_text(self.password.clone())),
+                    );
                 }
                 _ => {}
             },

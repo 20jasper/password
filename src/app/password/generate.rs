@@ -83,6 +83,8 @@ pub fn render(frame: &mut Frame<'_>, area: Rect, app: &App) {
         "<Left>/<H>".blue().bold(),
         " Increase Length ".into(),
         "<Right>/<L>".blue().bold(),
+        " Copy ".into(),
+        "<C>/<Y>".blue().bold(),
         " Back to List ".into(),
         "<Q> ".blue().bold(),
     ]));
